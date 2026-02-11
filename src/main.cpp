@@ -9,6 +9,7 @@
 #include "Application.h"
 #include "Exception.h"
 #include "FileBlob.h"
+#include "Failsafe.h"
 #include "LedSingle.h"
 #include "Log.h"
 #define LOGMODULE   LOGMODULE_BIT_SYSTEM
@@ -76,6 +77,10 @@ void setup() {
 
     Serial.begin(115200, SERIAL_8N1); // Setzen wir ggf fürs debgging gleich mal einen default Wert
    
+    if(Failsafe.check()) {
+        return;
+    }
+
     #if DEBUGHW==2
         #if DEBUG_OUTPUT==0
             Serial.begin(115200);
@@ -213,6 +218,9 @@ void setup() {
 }
 
 void loop() {
+    if (Failsafe.loop()) {
+        return;
+    }
 #if DEBUGHW==1
     if (dbg_string.length()) {          // Debug-Ausgaben TCP
         dbg_string+="\n";
